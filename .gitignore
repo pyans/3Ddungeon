@@ -1,0 +1,12 @@
+#ignore these files
+#vs project files
+*.sln
+*.db
+*.vcxproj
+*.filters
+#game data files
+*.dat
+#image files
+*.bmp
+#debug files
+Debug/
