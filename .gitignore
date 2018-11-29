@@ -10,3 +10,5 @@
 *.bmp
 #debug files
 Debug/
+#unknown file
+*.opendb
