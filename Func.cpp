@@ -22,6 +22,7 @@ void KeyControll(TCB* thisTCB) {
 	OFFInputBuff = (~PadInputBuff[0] & PadInputBuff[1]);	//Inputbuf: pushed	-> not
 }
 
+//システム情報 func.cpp/line:26
 SYS_INFO systeminfo = { 1,0,0 };
 #define STRMAX 512								//最長メッセージ数
 
@@ -30,6 +31,7 @@ SYS_INFO systeminfo = { 1,0,0 };
 *イベント用関数群*
 ******************
 ******************/
+//メッセージ型 func.cpp/line 34
 typedef struct {
 	char mes[STRMAX];
 }T_MESSAGE;

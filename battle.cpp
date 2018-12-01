@@ -105,7 +105,7 @@ void battle_player_command(TCB *thisTCB) {
 			for (i = BATTLERSNUM - MAXMONSTER; i < BATTLERSNUM; i++) {
 				if (var_parent->battler[i].chara_id > NO_EXSIT) {
 					//名前表示
-					sprintfDx(var_child->text[i - (BATTLERSNUM - MAXMONSTER)], monster_data[var_parent->battler[i].chara_id].name);
+					sprintfDx(var_child->text[var_child->num], monster_data[var_parent->battler[i].chara_id].name);
 					var_child->id[var_child->num] = i;
 					var_child->num++;
 				}
@@ -360,13 +360,20 @@ void event_battle(TCB* thisTCB) {
 	//優先度:0x2300
 	TYPE_BATTLE* var = (TYPE_BATTLE*)thisTCB->Work;
 	int i = 0;
+	unsigned int ikiteru = 0;
 	if (var->childTask == NULL || var->childTask->Flag != _USE) {
 		switch (var->flow) {
 		case BATTLE_END:
 			//プレイヤーとモンスター、どちらが死んだか調べ
 			//勝った場合成長や戦利品、負けた場合ゲームオーバーへ
-			//デバッグの為簡略化
-			if (var->battler[0].chara_id == NO_EXSIT) {
+			//各々の生存フラグ
+			ikiteru = 0;
+			for (i = 0; i < BATTLERSNUM; i++) {
+				if (var->battler[i].chara_id > NO_EXSIT) {
+					ikiteru = ikiteru | 1 << i;
+				}
+			}
+			if (!(ikiteru & 0xff)) {
 				//systeminfo.game_over = 1;
 				//ゲームオーバー処理がややこしいので、今は生き返る
 				party[0].hp = party[0].st.maxhp;
@@ -374,7 +381,7 @@ void event_battle(TCB* thisTCB) {
 				systeminfo.canmove = 1;
 				TaskKill(thisTCB);
 			}
-			else if (var->battler[8].chara_id == NO_EXSIT) {
+			else if (!(ikiteru & 0xff00)) {
 				//動けるようにする
 				systeminfo.canmove = 1;
 				TaskKill(thisTCB);
@@ -466,6 +473,11 @@ void event_battle(TCB* thisTCB) {
 				var_child2->act_enum = MESS;
 				var_child2->acter = i;
 				var_child2->defecer = var->battler[i].taisyou;
+				//対象不在の時は飛ばす
+				if (var->battler[var_child2->defecer].chara_id == NO_EXSIT) {
+					TaskKill(var->childTask);
+					var->counter++;
+				}
 			}
 			else {
 				//カウンタ増加
@@ -481,8 +493,12 @@ void event_battle(TCB* thisTCB) {
 	}
 
 	//モンスター画像表示
-	if (var->battler[8].chara_id > NO_EXSIT) {
-		DrawRotaGraph(192, 240, 4.0, 0, monster_img[var->battler[8].chara_id], TRUE);
+	int count_monster = 0;
+	for (i = BATTLERSNUM-1; i > BATTLERSNUM - MAXMONSTER-1; i--) {
+		if (var->battler[i].chara_id > NO_EXSIT) {
+			DrawRotaGraph(192+64*count_monster, 240, 4.0, 0, monster_img[var->battler[i].chara_id], TRUE);
+			count_monster++;
+		}
 	}
 
 	//消滅判定
