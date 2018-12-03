@@ -225,6 +225,11 @@ void exec_hero(TCB* thisTCB) {
 	//移動、メニュー開閉など
 	if (systeminfo.canmove) {
 		move(thisTCB);
+		//メニュー処理(デバッグ中)
+		if (ONInputBuff & PAD_INPUT_4) {
+			systeminfo.canmove = 0;
+			TaskMake(menu_equip,0x2500,thisTCB);
+		}
 	}
 	if (!(thisTCB->Parent->Flag & _USE)) {
 		//シーン終了とともに消滅(parent = exec03_gamescene)
@@ -364,6 +369,9 @@ void init03_SCENE_GAME(TCB* thisTCB) {
 	event_init();
 	//プレイやーステータスの調整
 	party[0] = { {1,120,36,18,23,20,16,15,21},120,36,{0,0,0,0,0,0,0,0},{ 0x41,0xff,0xff,0xff,0x80,0xa0,0xb0,0xff },"プレイヤー" };
+	//アイテムデータの初期化
+	info.item[0] = 0x50;
+	info.item[1] = 0x60;
 	int i, j;
 	//防御力算出
 	for (i = 4; i < EQUIPSIZE; i++) {

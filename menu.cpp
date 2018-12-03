@@ -16,35 +16,78 @@ typedef enum ENUM_05 {
 typedef struct TYPE_13 {
 	TCB* childTask;
 	ENUM_EQUIP equip_enum;
+	int who;
+	int place;
 	int id;
 }TYPE_MENU;
 
 void menu_equip(TCB* thisTCB) {
 	TYPE_MENU* var = (TYPE_MENU*)thisTCB->Work;
 	SENTAKU* var_child;
-	int i;
-	//一人目のキャラしかいないので、一人目のキャラの装備をいじる
-	while (var->childTask != NULL) {
+	int i,temp;
+	if (var->childTask == NULL || var->childTask->Flag != _USE) {
 		switch (var->equip_enum) {
 		case E_WHO:
 			//誰の
+			var->childTask = TaskMake(battle_choose, 0x2500,thisTCB);
+			var_child = (SENTAKU*)var->childTask->Work;
+			var_child->num = 0;
+			for (i = 0; i < (PARTY_NINZU); i++) {
+				sprintfDx(var_child->text[i], "%d:%s", i,party[i].name);
+				var_child->id[i] = i;
+				var_child->num++;
+			}
+			var_child->ret_p = &var->who;
+			var->equip_enum = E_WHERE;
 			break;
 		case E_WHERE:
 			//どの装備を
-			var->childTask = TaskMake(battle_choose, 0x2500);
+			if (var->who == -1) {
+				var->equip_enum = E_CANCEL;
+				break;
+			}
+			var->childTask = TaskMake(battle_choose, 0x2500, thisTCB);
 			var_child = (SENTAKU*)var->childTask->Work;
 			for (i = 0; i < (SENTAKU_X*SENTAKU_Y); i++) {
-				sprintfDx(var_child->text[i], "%s", item_data[party[0].equip[i]].name);
+				sprintfDx(var_child->text[i], "%s", item_data[party[var->who].equip[i]].name);
+				var_child->id[i] = i;
 			}
+			var_child->num = EQUIPSIZE;
+			var_child->ret_p = &var->place;
+			var->equip_enum = E_WHAT;
 			break;
 		case E_WHAT:
 			//どのアイテムと
+			if (var->place == -1) {
+				var->equip_enum = E_WHO;
+				break;
+			}
+			var->childTask = TaskMake(battle_choose, 0x2500, thisTCB);
+			var_child = (SENTAKU*)var->childTask->Work;
+			for (i = 0; i < (SENTAKU_X*SENTAKU_Y); i++) {
+				sprintfDx(var_child->text[i], "%s", item_data[info.item[i]].name);
+				var_child->id[i] = i;
+			}
+			var_child->num = EQUIPSIZE;
+			var_child->ret_p = &var->id;
+			var->equip_enum = E_CHANGE;
+			break;
+		case E_CHANGE:
+			//変更
+			if (var->id == -1) {
+				var->equip_enum = E_WHERE;
+				break;
+			}
+			temp = party[var->who].equip[var->place];
+			party[var->who].equip[var->place] =info.item[var->id];
+			info.item[var->id] = temp;
+			var->equip_enum = E_WHERE;
 			break;
 		default:
 			TaskKill(thisTCB);
+			systeminfo.canmove = 1;
 			break;
 		}
-		break;
 	}
 }
 

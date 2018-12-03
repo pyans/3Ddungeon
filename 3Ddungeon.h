@@ -5,6 +5,7 @@
 #include "other.h"
 #include "event.h"
 #include "battle.h"
+#include "menu.h"
 
 //変数宣言
 extern EVENT gameevent[LEVEL][EVENT_IN_A_FLOOR];		//イベントデータ

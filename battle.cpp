@@ -23,7 +23,7 @@ void battle_choose(TCB* thisTCB) {
 		*(var->ret_p) = var->id[var->choice];//死んだタスクとの交信はまずいのでポインタで記憶する
 		TaskKill(thisTCB);
 	}
-	//決定
+	//キャンセル
 	if (ONInputBuff & PAD_INPUT_2) {
 		*(var->ret_p) = -1;//いまはキャンセル=-1
 		TaskKill(thisTCB);

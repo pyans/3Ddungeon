@@ -132,7 +132,7 @@ void event_control(TCB *thisTCB) {
 			sprintfDx((char*)(var->childTask->Work), "•ó” ‚Ì’†g‚Í%d‚¾‚Á‚½I\n‚ ‚È‚½‚Í%s‚ð‘Ü‚É‚µ‚Ü‚Á‚½B", item_data[var->ix].name, item_data[var->ix].name);
 			for (i = 0; i < ITEMMAX; i++) {
 				if (info.item[i] == 0xFF) {
-					info.item[i] == var->ix;
+					info.item[i] = var->ix;
 					break;
 				}
 			}
