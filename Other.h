@@ -79,12 +79,12 @@ typedef struct TYPE_06 {
 
 //キャラデータ(サンプル)
 typedef struct TYPE_07 {
+	char name[NAMEMAX];
 	STATUS st;
 	int hp;
 	int mp;
 	int def[ZOKUSEI];
 	int equip[EQUIPSIZE];
-	char name[NAMEMAX];
 }CHARA;
 
 //メニューや戦闘の選択
@@ -139,7 +139,6 @@ typedef struct TYPE_0E {
 	STATUS st;
 	IMAGE_SIZE size;
 	int equip[EQUIPSIZE];
-	int def[ZOKUSEI];
 	int koudou;
 	int exp;				//ないし上昇レベル
 	int gold;				//ゴールド

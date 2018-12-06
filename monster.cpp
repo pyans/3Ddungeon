@@ -25,7 +25,6 @@ MONSTER_DATA monster_data[MONSTERNUM] = {
 		SIZE32,			//サイズ
 		//装備
 		{0x41,0xff,0xff,0xff,0x81,0xff,0xff,0xff},
-		{},//防御
 		0x00,			//行動パターン
 		5,				//EXP(上昇レベル)
 		10,				//ゴールド
@@ -51,7 +50,6 @@ MONSTER_DATA monster_data[MONSTERNUM] = {
 		SIZE32,			//サイズ
 		//装備
 		{ 0x42,0xff,0xff,0xff,0x80,0xff,0xff,0xff },
-		{},
 		0x00,			//行動パターン
 		5,				//EXP(上昇レベル)
 		10,				//ゴールド

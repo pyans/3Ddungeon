@@ -1,0 +1,11 @@
+
+//CHARA
+typedef struct{
+    char name[];
+    st cur_st;//現在ステータス 基本的にこちらを参照する
+    st bas_st;//基本ステータス
+    int equip[8];//装備欄
+    int def[8];//防御力
+}CHARA;
+
+CHARA member[16];
