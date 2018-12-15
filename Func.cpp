@@ -101,7 +101,7 @@ FLOORMAP dungeonmap[LEVEL];						//ダンジョンマップ
 //味方の情報
 PLAYER_INFO info;								//様々な情報
 CHARA party[PARTY_NINZU] = {};					//メインメンバー
-CHARA member[16];								//酒場などに待機させるサブメンバー
+CHARA sub_member[16];								//酒場などに待機させるサブメンバー
 
 int poscheck(POS a, POS b) {
 	//ポジション一致
