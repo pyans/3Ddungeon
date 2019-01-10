@@ -4,6 +4,8 @@
 *************************************/
 #include "3Ddungeon.h"
 
+CHARA battler_st[BATTLERSNUM];//戦闘者の能力値、hpなどのデータ。
+
 void battle_choose(TCB* thisTCB) {
 	SENTAKU* var = (SENTAKU*)thisTCB->Work;
 	int i, j;

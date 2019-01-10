@@ -28,7 +28,7 @@ typedef struct TYPE_0C_A {
 	int command;
 	int taisyou;
 	int speed;
-	int hp;
+	CHARA *st_data;
 }BATTLER;
 
 #define BATTLERSNUM 16		//Å‘åí“¬Q‰Ál”

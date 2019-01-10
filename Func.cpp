@@ -157,7 +157,6 @@ int soutai_col(int xplus, int yplus) {
 
 void move(TCB *thisTCB) {
 	//移動
-	int i;
 	//8フレーム連続入力したか？(うざいのでカット)
 	int Input8buf = 0x00000000;
 	int tempdir = (int)playerpos.dir;

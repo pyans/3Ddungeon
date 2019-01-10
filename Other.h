@@ -80,9 +80,9 @@ typedef struct TYPE_06 {
 //キャラデータ(サンプル)
 typedef struct TYPE_07 {
 	char name[NAMEMAX];
-	STATUS st;
-	int hp;
-	int mp;
+	STATUS bas_st;
+	STATUS cur_st;
+	int badst_buf;//ステ異常バッファ
 	int def[ZOKUSEI];
 	int equip[EQUIPSIZE];
 }CHARA;
