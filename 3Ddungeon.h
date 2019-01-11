@@ -16,6 +16,6 @@ extern const M_GROUP hensei[LEVEL][HENSEI_P];			//敵編成データ
 extern const WAZA_DATA waza_data[WAZAMAX];				//技データ
 extern ITEM item_data[ITEMNUM];							//アイテムのデータ
 extern PLAYER_POS playerpos;							//プレイヤー位置情報
-extern CHARA party[PARTY_NINZU];						//パーティ情報
+extern CHARA battler_chara[BATTLERSNUM];				//戦闘参加者情報
 extern SYS_INFO systeminfo;								//システム情報
 extern PLAYER_INFO info;								//プレイヤー情報

@@ -67,8 +67,8 @@ typedef struct TYPE_05 {
 //ステータスデータ(サンプル)
 typedef struct TYPE_06 {
 	int lv;
-	int maxhp;
-	int maxmp;
+	int hp;
+	int mp;
 	int str;
 	int agi;
 	int mus;

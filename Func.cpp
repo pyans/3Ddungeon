@@ -52,7 +52,7 @@ void char_message(TCB *thisTCB) {
 	int i;
 	int line = 0, col = 0;
 	//今はHP表示なので(後できちんと直すこと)
-	sprintfDx(var->mes, "HP:%d/%d\nMP:%d/%d", party[0].hp, party[0].st.maxhp, party[0].mp, party[0].st.maxmp);
+	sprintfDx(var->mes, "HP:%d/%d\nMP:%d/%d", battler_chara[0].cur_st.hp, battler_chara[0].bas_st.hp, battler_chara[0].cur_st.mp, battler_chara[0].bas_st.mp);
 	for (i = 0; i < strlen(var->mes); i++) {
 		char temp = var->mes[i];
 		//改行
@@ -100,7 +100,7 @@ FLOORMAP dungeonmap[LEVEL];						//ダンジョンマップ
 
 //味方の情報
 PLAYER_INFO info;								//様々な情報
-CHARA party[PARTY_NINZU] = {};					//メインメンバー
+CHARA battler_chara[BATTLERSNUM] = {};					//メインメンバー
 CHARA sub_member[16];								//酒場などに待機させるサブメンバー
 
 int poscheck(POS a, POS b) {
@@ -367,7 +367,7 @@ void init03_SCENE_GAME(TCB* thisTCB) {
 	playerpos = { {30,29},WEST };
 	event_init();
 	//プレイやーステータスの調整
-	party[0] = {"プレイヤー", {1,120,36,18,23,20,16,15,21},120,36,{0,0,0,0,0,0,0,0},{ 0x41,0xff,0xff,0xff,0x80,0xa0,0xb0,0xff } };
+	battler_chara[0] = {"プレイヤー", {1,120,36,18,23,20,16,15,21},{ 1,120,36,18,23,20,16,15,21 },0,{0,0,0,0,0,0,0,0},{ 0x41,0xff,0xff,0xff,0x80,0xa0,0xb0,0xff } };
 	//アイテムデータの初期化
 	info.item[0] = 0x50;
 	info.item[1] = 0x60;
@@ -375,7 +375,7 @@ void init03_SCENE_GAME(TCB* thisTCB) {
 	//防御力算出
 	for (i = 4; i < EQUIPSIZE; i++) {
 		for (j = 0; j < ZOKUSEI; j++) {
-			party[0].def[j] += item_data[party[0].equip[i]].def[j];
+			battler_chara[0].def[j] += item_data[battler_chara[0].equip[i]].def[j];
 		}
 	}
 	//必要なタスク制作
@@ -385,7 +385,7 @@ void init03_SCENE_GAME(TCB* thisTCB) {
 	//プレイヤー名表示
 	TCB* childTask = TaskMake(char_message, 0x2300, thisTCB);
 	T_CMESSAGE* var = (T_CMESSAGE*)childTask->Work;
-	sprintfDx(var->mes, "HP:%d/%d\nMP:%d/%d", party[0].hp,party[0].st.maxhp, party[0].mp, party[0].st.maxmp);
+	sprintfDx(var->mes, "HP:%d/%d\nMP:%d/%d", battler_chara[0].cur_st.hp,battler_chara[0].bas_st.hp, battler_chara[0].cur_st.mp, battler_chara[0].bas_st.mp);
 	var->pos = { 448,48 };
 	TaskChange(thisTCB, exec03_SCENE_GAME);
 }
@@ -595,7 +595,7 @@ void TotalInit(TCB* thisTCB) {
 	//モンスター画像ロード
 	for (i = 0; i < MONSTERNUM; i++) {
 		//HP0のモンスターは存在しないものとする
-		if (monster_data[i].st.maxhp != 0) {
+		if (monster_data[i].st.hp != 0) {
 			snprintfDx(name, 256, "./image/monster/monster_%d.bmp", i);
 			monster_img[i] = LoadGraph(name);
 		}

@@ -154,8 +154,8 @@ void event_control(TCB *thisTCB) {
 		case HEAL:
 			//‰ñ•œ
 			var->ix++;
-			party[0].hp = party[0].st.maxhp;
-			party[0].mp = party[0].st.maxmp;
+			battler_chara[0].cur_st.hp = battler_chara[0].bas_st.hp;
+			battler_chara[0].cur_st.mp = battler_chara[0].bas_st.mp;
 		default:
 			break;
 		}

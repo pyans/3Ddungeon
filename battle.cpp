@@ -62,10 +62,10 @@ void battle_player_command(TCB *thisTCB) {
 			var_child = (SENTAKU*)var->childTask->Work;
 			var_child->ret_p = &var->waza_id;
 			//初期アイコン位置決定
-			temp_i = item_data[party[var_parent->counter].equip[var->equip]];
+			temp_i = item_data[battler_chara[var_parent->counter].equip[var->equip]];
 			while (temp_i.waza[0] == -1) {
 				var->equip++;
-				temp_i = item_data[party[var_parent->counter].equip[var->equip]];
+				temp_i = item_data[battler_chara[var_parent->counter].equip[var->equip]];
 			}
 			sprintfDx(var_child->text[0], "%-15s:%d", temp_i.name, 0);
 			var_child->id[0] = temp_i.waza[0];
@@ -73,7 +73,7 @@ void battle_player_command(TCB *thisTCB) {
 			var_child->num = 2;
 			//装備固有技
 			for (i = 1; i < SOUBIWAZA; i++) {
-				if (item_data[party[var_parent->counter].equip[var->equip]].waza[i] != -1) {
+				if (item_data[battler_chara[var_parent->counter].equip[var->equip]].waza[i] != -1) {
 					//技名、技idを入力
 					sprintfDx(var_child->text[i], "%-15s:%d", waza_data[temp_i.waza[i]].name, waza_data[temp_i.waza[i]].cost);
 					var_child->id[i] = temp_i.waza[i];
@@ -126,10 +126,10 @@ void battle_player_command(TCB *thisTCB) {
 			else if (PTaskDead(thisTCB) == FALSE) {
 				var_parent->battler[var_parent->counter].command = var->waza_id;
 				var_parent->battler[var_parent->counter].taisyou = var->whom;
-				var_parent->battler[var_parent->counter].weppon = party[var_parent->counter].equip[var->equip];
-				var_parent->battler[var_parent->counter].speed = party[var_parent->counter].st.agi*(1 + GetRand(255) / 256);
+				var_parent->battler[var_parent->counter].weppon = battler_chara[var_parent->counter].equip[var->equip];
+				var_parent->battler[var_parent->counter].speed = battler_chara[var_parent->counter].cur_st.agi*(1 + GetRand(255) / 256);
 				//MP消費(本番は行動時に)
-				party[var_parent->counter].mp -= waza_data[var->waza_id].cost;
+				battler_chara[var_parent->counter].cur_st.mp -= waza_data[var->waza_id].cost;
 				//カウンタを増やす
 				var_parent->counter++;
 			}
@@ -238,16 +238,18 @@ int damege_clu(TCB* thisTCB) {
 	}
 	//能力値コピー
 	if (atk_is_monster) {
+		//最終的に現在ステータスを使う
 		act_st = monster_data[atk_monster_id].st;
 	}
 	else {
-		act_st = party[atk_party_id].st;
+		act_st = battler_chara[atk_party_id].cur_st;
 	}
 	if (def_is_monster) {
+		//最終的に現在ステータスを使う
 		def_st = monster_data[def_monster_id].st;
 	}
 	else {
-		def_st = party[def_party_id].st;
+		def_st = battler_chara[def_party_id].cur_st;
 	}
 	//武器データ
 	weppon = item_data[var_parent->battler[acter].weppon];
@@ -265,10 +267,11 @@ int damege_clu(TCB* thisTCB) {
 			//初物か前の防御力より低ければ
 			if (prevdef == 0 || def < prevdef) {
 				if (def_is_monster) {
-					def = monster_data[def_monster_id].def[i];
+					//ここもいじる
+					def = battler_chara[def_monster_id].def[i];
 				}
 				else {
-					def = party[def_party_id].def[i];
+					def = battler_chara[def_party_id].def[i];
 				}
 			}
 		}
@@ -293,7 +296,7 @@ void battle_act(TCB* thisTCB) {
 				sprintfDx((char*)(var->childTask->Work), "%sの行動！", monster_data[var_parent->battler[var->acter].chara_id].name);
 			}
 			else {
-				sprintfDx((char*)(var->childTask->Work), "%sの行動！", party[var->acter].name);
+				sprintfDx((char*)(var->childTask->Work), "%sの行動！", battler_chara[var->acter].name);
 			}
 			var->act_enum = EFF;
 			if (var_parent->battler[var->acter].command == COMM_DEF) {
@@ -302,7 +305,7 @@ void battle_act(TCB* thisTCB) {
 					sprintfDx((char*)(var->childTask->Work), "%sは身を守った！", monster_data[var_parent->battler[var->acter].chara_id].name);
 				}
 				else {
-					sprintfDx((char*)(var->childTask->Work), "%sは身を守った！", party[var->acter].name);
+					sprintfDx((char*)(var->childTask->Work), "%sは身を守った！", battler_chara[var->acter].name);
 				}
 				var->act_enum = END_DM;
 			}
@@ -320,7 +323,7 @@ void battle_act(TCB* thisTCB) {
 			if (waza_data[var_parent->battler[var->defecer].command].type == SKILL_DEF) {
 				d = d / 2;
 			}
-			var_parent->battler[var->defecer].hp = max(0, (var_parent->battler[var->defecer].hp - d));
+			battler_chara[var->defecer].cur_st.hp = max(0, (battler_chara[var->defecer].cur_st.hp - d));
 			//メッセージ
 			var->childTask = TaskMake(message, thisTCB->Prio + 0x0100, thisTCB);
 			if (var->defecer >= (BATTLERSNUM - MAXMONSTER)) {
@@ -328,21 +331,20 @@ void battle_act(TCB* thisTCB) {
 				sprintfDx((char*)(var->childTask->Work), "%sに %dのダメージ！", monster_data[var_parent->battler[var->defecer].chara_id].name, d);
 			}
 			else {
-				sprintfDx((char*)(var->childTask->Work), "%sに %dのダメージ！", party[var->defecer].name, d);
-				party[var->defecer].hp = var_parent->battler[var->defecer].hp;
+				sprintfDx((char*)(var->childTask->Work), "%sに %dのダメージ！", battler_chara[var->defecer].name, d);
 			}
 			var->act_enum = DEATH;
 			break;
 		case DEATH:
 			//死亡確認
-			if (var_parent->battler[var->defecer].hp == 0) {
+			if (battler_chara[var->defecer].cur_st.hp == 0) {
 				var->childTask = TaskMake(message, thisTCB->Prio + 0x0100, thisTCB);
 				if (var->defecer >= (BATTLERSNUM - MAXMONSTER)) {
 					//敵行動
 					sprintfDx((char*)(var->childTask->Work), "%sを倒した！", monster_data[var_parent->battler[var->defecer].chara_id].name);
 				}
 				else {
-					sprintfDx((char*)(var->childTask->Work), "%sは倒れた……\nしかし、今は開発中なので復活した!", party[var->defecer].name);
+					sprintfDx((char*)(var->childTask->Work), "%sは倒れた……\nしかし、今は開発中なので復活した!", battler_chara[var->defecer].name);
 				}
 				var_parent->battler[var->defecer].chara_id = -1;
 			}
@@ -378,7 +380,7 @@ void event_battle(TCB* thisTCB) {
 			if (!(ikiteru & 0xff)) {
 				//systeminfo.game_over = 1;
 				//ゲームオーバー処理がややこしいので、今は生き返る
-				party[0].hp = party[0].st.maxhp;
+				battler_chara[0].cur_st.hp = battler_chara[0].bas_st.hp;
 				//動けるようにする
 				systeminfo.canmove = 1;
 				TaskKill(thisTCB);
@@ -522,14 +524,14 @@ void init_event_battle(TCB* thisTCB) {
 				//グループidが編成パターン数より下→通常エンカウント
 				var->battler[i].chara_id = hensei[playerpos.nowfloor][var->group_id].id[i - MAXMONSTER];
 				if (var->battler[i].chara_id > NO_EXSIT) {
-					var->battler[i].hp = monster_data[var->battler[i].chara_id].st.maxhp;
+					battler_chara[i].cur_st.hp = monster_data[var->battler[i].chara_id].st.hp;
 					//守備力の更新
 					for (k = 0; k < ZOKUSEI; k++) {
-						monster_data[var->battler[i].chara_id].def[k] = 0;
+						battler_chara[i].def[k] = 0;
 					}
 					for (j = 4; j < EQUIPSIZE; j++) {
 						for (k = 0; k < ZOKUSEI; k++) {
-							monster_data[var->battler[i].chara_id].def[k] += item_data[monster_data[var->battler[i].chara_id].equip[j]].def[k];
+							battler_chara[i].def[k] += item_data[monster_data[var->battler[i].chara_id].equip[j]].def[k];
 						}
 					}
 				}
@@ -541,21 +543,21 @@ void init_event_battle(TCB* thisTCB) {
 		}
 		else {
 			if (i < PARTY_NINZU) {
-				if (party[i].st.maxhp < 1) {
-					//HPが0以下のキャラは存在しないものとする
+				if (battler_chara[i].bas_st.hp < 1) {
+					//元ステータスHPが0以下のキャラは存在しないものとする
 					var->battler[i].chara_id = -1;
 				}
 				else {
 					//キャラidの3バイト目に書き込む
 					var->battler[i].chara_id = i << 16;
-					var->battler[i].hp = party[i].hp;
+					var->battler[i].st_data = &battler_chara[i];
 					//守備力の更新
 					for (k = 0; k < ZOKUSEI; k++) {
-						party[i].def[k] = 0;
+						battler_chara[i].def[k] = 0;
 					}
 					for (j = 4; j < EQUIPSIZE; j++) {
 						for (k = 0; k < ZOKUSEI; k++) {
-							party[i].def[k] += item_data[party[i].equip[j]].def[k];
+							battler_chara[i].def[k] += item_data[battler_chara[i].equip[j]].def[k];
 						}
 					}
 				}

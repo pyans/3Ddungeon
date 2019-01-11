@@ -33,7 +33,7 @@ void menu_equip(TCB* thisTCB) {
 			var_child = (SENTAKU*)var->childTask->Work;
 			var_child->num = 0;
 			for (i = 0; i < (PARTY_NINZU); i++) {
-				sprintfDx(var_child->text[i], "%d:%s", i,party[i].name);
+				sprintfDx(var_child->text[i], "%d:%s", i,battler_chara[i].name);
 				var_child->id[i] = i;
 				var_child->num++;
 			}
@@ -49,7 +49,7 @@ void menu_equip(TCB* thisTCB) {
 			var->childTask = TaskMake(battle_choose, 0x2500, thisTCB);
 			var_child = (SENTAKU*)var->childTask->Work;
 			for (i = 0; i < (SENTAKU_X*SENTAKU_Y); i++) {
-				sprintfDx(var_child->text[i], "%s", item_data[party[var->who].equip[i]].name);
+				sprintfDx(var_child->text[i], "%s", item_data[battler_chara[var->who].equip[i]].name);
 				var_child->id[i] = i;
 			}
 			var_child->num = EQUIPSIZE;
@@ -78,8 +78,8 @@ void menu_equip(TCB* thisTCB) {
 				var->equip_enum = E_WHERE;
 				break;
 			}
-			temp = party[var->who].equip[var->place];
-			party[var->who].equip[var->place] =info.item[var->id];
+			temp = battler_chara[var->who].equip[var->place];
+			battler_chara[var->who].equip[var->place] =info.item[var->id];
 			info.item[var->id] = temp;
 			var->equip_enum = E_WHERE;
 			break;
